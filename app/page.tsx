@@ -1,130 +1,187 @@
-// Craft Imports
-import { Section, Container } from "@/components/craft";
-import Balancer from "react-wrap-balancer";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Image from "next/image"
+import Link from "next/link"
+import { ArrowRight, Clock, Shield, Star, Wrench, Hammer, Lightbulb, Droplets, Wind, Paintbrush, Ruler } from "lucide-react"
+import { getUnsplashImage } from "@/lib/unsplash"
 
-// Components
-import Link from "next/link";
+export default async function Home() {
+  // Fetch images for different sections with error handling
+  const [heroImage, ...servicesImages] = await Promise.all([
+    getUnsplashImage("handyman,repair,professional").catch(() => null),
+    ...services.map(service => 
+      getUnsplashImage(`${service.title.toLowerCase()},repair,service`).catch(() => null)
+    )
+  ])
 
-// Icons
-import { File, Pen, Tag, Boxes, User, Folder } from "lucide-react";
+  const ctaImage = await getUnsplashImage("home,repair,tools").catch(() => null)
 
-// This page is using the craft.tsx component and design system
-export default function Home() {
   return (
-    <Section>
-      <Container>
-        <ExampleJsx />
-      </Container>
-    </Section>
-  );
+    <main className="flex min-h-screen flex-col">
+      {/* Hero Section */}
+      <section className="bg-background border-b">
+        <div className="max-w-[1800px] mx-auto px-8 py-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="max-w-2xl">
+              <h1 className="text-6xl font-bold mb-8 text-foreground">On Time, Done Right.</h1>
+              <p className="text-2xl text-muted-foreground mb-10">
+                Professional handyman services for your home and business needs. Expert technicians, reliable service, and competitive pricing.
+              </p>
+              
+              {/* City Selector */}
+              <div className="space-y-6 max-w-lg">
+                <h3 className="text-xl font-semibold text-foreground">Select Your City</h3>
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose your location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dubai">Dubai</SelectItem>
+                    <SelectItem value="abudhabi">Abu Dhabi</SelectItem>
+                    <SelectItem value="sharjah">Sharjah</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="lg" className="w-full text-lg py-6">
+                  Book Now <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+            <div className="relative h-[700px] rounded-lg overflow-hidden">
+              {heroImage && (
+                <Image
+                  src={heroImage}
+                  alt="Professional Handyman"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-24">
+        <div className="max-w-[1800px] mx-auto px-8">
+          <h2 className="text-4xl font-bold text-center mb-16 text-foreground">Our Services</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service, index) => (
+              <Link href={service.href} key={service.title}>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <div className="relative h-48 w-full">
+                    {servicesImages[index] && (
+                      <Image
+                        src={servicesImages[index]}
+                        alt={service.title}
+                        fill
+                        className="object-cover rounded-t-lg"
+                      />
+                    )}
+                  </div>
+                  <CardContent className="p-8">
+                    <div className="flex items-start space-x-4">
+                      <div className="h-14 w-14 flex items-center justify-center rounded-full bg-accent">
+                        {service.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-xl mb-3 text-foreground">{service.title}</h3>
+                        <p className="text-muted-foreground text-lg">{service.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-primary relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          {ctaImage && (
+            <Image
+              src={ctaImage}
+              alt="Background"
+              fill
+              className="object-cover"
+            />
+          )}
+        </div>
+        <div className="max-w-[1800px] mx-auto px-8 text-center relative z-10">
+          <h2 className="text-5xl font-bold mb-8 text-primary-foreground">Ready to Get Started?</h2>
+          <p className="text-2xl mb-10 max-w-4xl mx-auto text-primary-foreground/90">
+            Book your service today and experience the best in professional handyman services
+          </p>
+          <Button size="lg" variant="secondary" className="text-lg py-6 px-8">
+            Book a Service
+          </Button>
+      </div>
+      </section>
+    </main>
+  )
 }
 
-// This is just some example JS to demonstrate automatic styling from brijr/craft
-const ExampleJsx = () => {
-  return (
-    <article className="prose-m-none">
-      <h1>
-        <Balancer>
-          Hello World, welcome to the Next.js and WordPress Starter by{" "}
-          <a href="https://9d8.dev">9d8</a>.
-        </Balancer>
-      </h1>
-      {/* Vercel Clone Starter */}
-      <a
-        className="h-16 block"
-        href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F9d8dev%2Fnext-wp&env=WORDPRESS_URL,WORDPRESS_HOSTNAME&envDescription=Add%20WordPress%20URL%20with%20Rest%20API%20enabled%20(ie.%20https%3A%2F%2Fwp.example.com)%20abd%20the%20hostname%20for%20Image%20rendering%20in%20Next%20JS%20(ie.%20wp.example.com)&project-name=next-wp&repository-name=next-wp&demo-title=Next%20JS%20and%20WordPress%20Starter&demo-url=https%3A%2F%2Fwp.9d8.dev"
-      >
-        {/* eslint-disable-next-line */}
-        <img
-          className="not-prose my-4"
-          src="https://vercel.com/button"
-          alt="Deploy with Vercel"
-        />
-      </a>
-      <p>
-        This is <a href="https://github.com/9d8dev/next-wp">next-wp</a>, created
-        as a way to build WordPress sites with Next.js at rapid speed. This
-        starter is designed with <a href="https://ui.shadcn.com">shadcn/ui</a>,{" "}
-        <a href="https://github.com/brijr/craft">brijr/craft</a>, and Tailwind
-        CSS. Use <a href="https://components.bridger.to">brijr/components</a> to
-        build your site with prebuilt components. The data fetching and
-        typesafety is handled in <code>lib/WordPress.ts</code> and{" "}
-        <code>lib/WordPress.d.ts</code>. Questions? Email 9d8dev@gmail.com
-      </p>
-      <div className="grid md:grid-cols-3 gap-4 mt-6 not-prose">
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts"
-        >
-          <Pen size={32} />
-          <span>
-            Posts{" "}
-            <span className="block text-sm text-muted-foreground">
-              All posts from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/pages"
-        >
-          <File size={32} />
-          <span>
-            Pages{" "}
-            <span className="block text-sm text-muted-foreground">
-              Custom pages from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/authors"
-        >
-          <User size={32} />
-          <span>
-            Authors{" "}
-            <span className="block text-sm text-muted-foreground">
-              List of the authors from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/tags"
-        >
-          <Tag size={32} />
-          <span>
-            Tags{" "}
-            <span className="block text-sm text-muted-foreground">
-              Content by tags from your WordPress
-            </span>
-          </span>
-        </Link>
-        <Link
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="/posts/categories"
-        >
-          <Boxes size={32} />
-          <span>
-            Categories{" "}
-            <span className="block text-sm text-muted-foreground">
-              Categories from your WordPress
-            </span>
-          </span>
-        </Link>
-        <a
-          className="border h-48 bg-accent/50 rounded-lg p-4 flex flex-col justify-between hover:scale-[1.02] transition-all"
-          href="https://github.com/9d8dev/next-wp"
-        >
-          <Folder size={32} />
-          <span>
-            Documentation{" "}
-            <span className="block text-sm text-muted-foreground">
-              How to use `next-wp`
-            </span>
-          </span>
-        </a>
-      </div>
-    </article>
-  );
-};
+const services = [
+  {
+    title: "Electrical Services",
+    description: "Professional electrical repairs and installations",
+    icon: <Lightbulb className="h-6 w-6 text-primary" />,
+    href: "/services"
+  },
+  {
+    title: "Plumbing",
+    description: "Expert plumbing solutions for any issue",
+    icon: <Droplets className="h-6 w-6 text-primary" />,
+    href: "/services"
+  },
+  {
+    title: "Home Maintenance",
+    description: "Complete home maintenance and repairs",
+    icon: <Wrench className="h-6 w-6 text-primary" />,
+    href: "/services"
+  },
+  {
+    title: "AC Services",
+    description: "AC installation, repair, and maintenance",
+    icon: <Wind className="h-6 w-6 text-primary" />,
+    href: "/services"
+  },
+  {
+    title: "Painting",
+    description: "Professional painting services",
+    icon: <Paintbrush className="h-6 w-6 text-primary" />,
+    href: "/services"
+  },
+  {
+    title: "Carpentry",
+    description: "Custom carpentry and furniture repairs",
+    icon: <Ruler className="h-6 w-6 text-primary" />,
+    href: "/services"
+  }
+]
+
+const features = [
+  {
+    title: "Professional Experts",
+    description: "Skilled and certified technicians",
+    icon: <Shield className="h-12 w-12" />
+  },
+  {
+    title: "On-Time Service",
+    description: "Punctual and reliable service delivery",
+    icon: <Clock className="h-12 w-12" />
+  },
+  {
+    title: "Quality Work",
+    description: "100% satisfaction guaranteed",
+    icon: <Star className="h-12 w-12" />
+  },
+  {
+    title: "24/7 Support",
+    description: "Round-the-clock customer service",
+    icon: <Hammer className="h-12 w-12" />
+  }
+]

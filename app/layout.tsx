@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google";
+import { Lato } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -8,32 +8,23 @@ import "./globals.css";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/nav/mobile-nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Main } from "@/components/craft";
 import { mainMenu, contentMenu } from "@/menu.config";
-import { Section, Container } from "@/components/craft";
-import Balancer from "react-wrap-balancer";
-
-import Logo from "@/public/logo.svg";
-
+import { siteConfig } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
-
 import { cn } from "@/lib/utils";
 
-const fontSans = FontSans({
+const lato = Lato({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+  weight: ["100", "300", "400", "700", "900"],
 });
 
 export const metadata: Metadata = {
-  title: "WordPress & Next.js Starter by 9d8",
-  description:
-    "A starter template for Next.js with WordPress as a headless CMS.",
-  metadataBase: new URL("https://wp.9d8.dev"),
+  title: siteConfig.name,
+  description: siteConfig.description,
 };
-
-// Revalidate content every hour
-export const revalidate = 3600;
 
 export default function RootLayout({
   children,
@@ -43,127 +34,80 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body
-        className={cn("min-h-screen font-sans antialiased", fontSans.variable)}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Nav />
-          <Main>{children}</Main>
-          <Footer />
+      <body className={cn("min-h-screen font-sans antialiased", lato.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className={siteConfig.containerWidth}>
+              <div className="flex h-20 items-center justify-between">
+                <Link href="/" className="flex items-center space-x-2">
+                  <Image src="/logo.svg" alt={siteConfig.name} width={40} height={40} />
+                  <span className="text-xl font-bold">{siteConfig.name}</span>
+                </Link>
+                <nav className="hidden md:flex items-center gap-6">
+                  {Object.entries(mainMenu).map(([key, href]) => (
+                    <Button key={key} variant="ghost" asChild>
+                      <Link href={href}>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </Link>
+                    </Button>
+                  ))}
+                  <ThemeToggle />
+                </nav>
+                <MobileNav />
+              </div>
+            </div>
+          </header>
+          <main>{children}</main>
+          <footer className="border-t bg-background">
+            <div className={siteConfig.containerWidth}>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-16">
+                <div className="space-y-4">
+                  <Link href="/" className="flex items-center space-x-2">
+                    <Image src="/logo.svg" alt={siteConfig.name} width={40} height={40} />
+                    <span className="text-xl font-bold">{siteConfig.name}</span>
+                  </Link>
+                  <p className="text-muted-foreground">{siteConfig.description}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-4">Website</h3>
+                  <nav className="flex flex-col gap-2">
+                    {Object.entries(mainMenu).map(([key, href]) => (
+                      <Link key={key} href={href} className="text-muted-foreground hover:text-foreground">
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-4">Blog</h3>
+                  <nav className="flex flex-col gap-2">
+                    {Object.entries(contentMenu).map(([key, href]) => (
+                      <Link key={key} href={href} className="text-muted-foreground hover:text-foreground">
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Stay Connected</h3>
+                  <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                  </div>
+                </div>
+              </div>
+              <div className="border-t py-6 flex flex-col md:flex-row justify-between gap-4">
+                <p className="text-sm text-muted-foreground">
+                  © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Crafted with ❤️ in UAE
+                </p>
+              </div>
+            </div>
+          </footer>
         </ThemeProvider>
         <Analytics />
       </body>
     </html>
   );
 }
-
-const Nav = ({ className, children, id }: NavProps) => {
-  return (
-    <nav
-      className={cn(
-        "sticky z-50 top-0 bg-background",
-        "border-b",
-        "fade-in",
-        className
-      )}
-      id={id}
-    >
-      <div
-        id="nav-container"
-        className="max-w-5xl mx-auto py-4 px-6 sm:px-8 flex justify-between items-center"
-      >
-        <Link
-          className="hover:opacity-75 transition-all flex gap-2 items-center"
-          href="/"
-        >
-          <h2 className="sr-only">next-wp starter</h2>
-          <Image
-            src={Logo}
-            alt="Logo"
-            className="dark:invert"
-            width={42}
-            height={26.44}
-          ></Image>
-        </Link>
-        {children}
-        <div className="flex items-center gap-2">
-          <div className="mx-2 hidden md:flex">
-            {Object.entries(mainMenu).map(([key, href]) => (
-              <Button key={href} asChild variant="ghost" size="sm">
-                <Link href={href}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </Link>
-              </Button>
-            ))}
-          </div>
-          <Button asChild className="hidden sm:flex">
-            <Link href="https://github.com/9d8dev/next-wp">Get Started</Link>
-          </Button>
-          <MobileNav />
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-const Footer = () => {
-  return (
-    <footer>
-      <Section>
-        <Container className="grid md:grid-cols-[1.5fr_0.5fr_0.5fr] gap-12">
-          <div className="flex flex-col gap-6 not-prose">
-            <Link href="/">
-              <h3 className="sr-only">brijr/components</h3>
-              <Image
-                src={Logo}
-                alt="Logo"
-                className="dark:invert"
-                width={42}
-                height={26.44}
-              ></Image>
-            </Link>
-            <p>
-              <Balancer>Next.js meets headless WordPress</Balancer>
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <h5 className="font-medium text-base">Website</h5>
-            {Object.entries(mainMenu).map(([key, href]) => (
-              <Link
-                className="hover:underline underline-offset-4"
-                key={href}
-                href={href}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <h5 className="font-medium text-base">Blog</h5>
-            {Object.entries(contentMenu).map(([key, href]) => (
-              <Link
-                className="hover:underline underline-offset-4"
-                key={href}
-                href={href}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </Link>
-            ))}
-          </div>
-        </Container>
-        <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
-          <ThemeToggle />
-          <p className="text-muted-foreground">
-            © <a href="https://9d8.dev">9d8</a>. All rights reserved.
-            2024-present.
-          </p>
-        </Container>
-      </Section>
-    </footer>
-  );
-};

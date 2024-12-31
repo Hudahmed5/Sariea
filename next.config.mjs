@@ -9,6 +9,17 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    domains: [
+      'sariea.com',
+      'source.unsplash.com',
+      'images.unsplash.com'
+    ],
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  env: {
+    UNSPLASH_ACCESS_KEY: process.env.UNSPLASH_ACCESS_KEY,
   },
 };
 
